@@ -180,7 +180,12 @@ static int ivshmem_pci_probe(struct pci_dev *dev,
 
 	if (request_msix_vectors(ivshmem_info, nvectors) != 0) {
 		printk(KERN_INFO "regular IRQs\n");
-		info->irq = dev->irq;
+		if (dev->pin) {
+			info->irq = dev->irq;
+		}else{
+			printk(KERN_INFO "No IRQ assigned to device: no support for interrupts?\n");
+			info->irq = -1;
+		}
 		info->irq_flags = IRQF_SHARED;
 		info->handler = ivshmem_handler;
 		writel(0xffffffff, info->mem[0].internal_addr + IntrMask);
